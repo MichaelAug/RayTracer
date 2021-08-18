@@ -4,7 +4,7 @@ fn main() {
     const IMAGE_HEIGHT: i32 = 256;
 
     let test = ray_tracer::Vec3::default();
-
+    
     println!("Vec3 = {:#?}", test);
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
