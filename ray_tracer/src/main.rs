@@ -1,11 +1,12 @@
+use cgmath::Vector3;
 
+type Point3 = cgmath::Vector3<f64>;
+type Colour = cgmath::Vector3<f64>;
+
+const IMAGE_WIDTH: i32 = 256;
+const IMAGE_HEIGHT: i32 = 256;
 fn main() {
-    const IMAGE_WIDTH: i32 = 256;
-    const IMAGE_HEIGHT: i32 = 256;
-
-    let test = ray_tracer::Vec3::default();
     
-    println!("Vec3 = {:#?}", test);
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
