@@ -1,16 +1,15 @@
-use cgmath::{Point3, Vector3};
-
+use super::Vec3;
 pub struct Ray {
-    pub orig: Point3<f64>,
-    pub dir: Vector3<f64>
+    pub orig: Vec3,
+    pub dir: Vec3
 }
 
 impl Ray {
-    pub fn new(orig: Point3<f64>, dir: Vector3<f64>) -> Self {
+    pub fn new(orig: Vec3, dir: Vec3) -> Self {
         Ray{orig,dir}
     }
 
-    pub fn at(&self, t: f64) -> Point3<f64> {
+    pub fn at(&self, t: f64) -> Vec3 {
         self.orig + t*self.dir
     }
 }

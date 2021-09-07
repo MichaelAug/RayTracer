@@ -1,7 +1,4 @@
-use cgmath::{InnerSpace, Point3, Vector3};
-use ray_tracer::Ray;
-
-type Colour = cgmath::Vector3<f64>;
+use ray_tracer::{Ray, Vec3, Point3, Colour};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: i32 = 400;
@@ -13,10 +10,10 @@ fn main() {
     let focal_length = 1.0;
 
     let origin = Point3::new(0.0, 0.0, 0.0);
-    let horizontal: Vector3<f64> = Vector3::new(viewport_width,0.0 , 0.0);
-    let vertical: Vector3<f64> = Vector3::new(0.0, viewport_height, 0.0);
+    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
+    let vertical = Vec3::new(0.0, viewport_height, 0.0);
     let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vector3::new(0.0, 0.0, focal_length);
+        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     // Render
@@ -48,7 +45,26 @@ fn write_colour(pixel_col: &Colour) {
 }
 
 fn ray_colour(r: &Ray) -> Colour {
-    let unit_dir = r.dir.clone().normalize();
-    let t = 0.5 * (unit_dir.y + 1.0);
-    (1.0 - t) * Colour::new(1.0, 1.0, 1.0) + t * Colour::new(0.5, 0.7, 1.0)
+    let t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, r);
+    if t > 0.0 {
+        let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalized();
+        0.5 * Colour::new(n.x+1.0, n.y+1.0, n.z+1.0)
+    } else {
+        let unit_dir = r.dir.normalized();
+        let t = 0.5 * (unit_dir.y + 1.0);
+        (1.0 - t) * Colour::new(1.0, 1.0, 1.0) + t * Colour::new(0.5, 0.7, 1.0)
+    }
+}
+
+fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
+    let oc = r.orig - *center;
+    let a = Vec3::dot(&r.dir, &r.dir);
+    let b = 2.0 * Vec3::dot(&oc, &r.dir);
+    let c = Vec3::dot(&oc, &oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-b - discriminant.sqrt()) / (2.0*a)
+    }
 }
