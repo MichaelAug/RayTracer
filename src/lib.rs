@@ -1,6 +1,12 @@
 mod ray;
 mod vector3;
+mod hittable;
+mod sphere;
 pub use ray::Ray;
 pub use vector3::Vec3;
 pub use vector3::Point3;
 pub use vector3::Colour;
+pub use hittable::Hittable;
+pub use hittable::HitRecord;
+pub use hittable::HittableList;
+pub use sphere::Sphere;
