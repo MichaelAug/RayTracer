@@ -1,22 +1,26 @@
-use super::{Point3, Vec3, Ray};
+use super::{Point3, Ray, Vec3};
 
 #[derive(Default)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
-    pub front_face: bool
+    pub front_face: bool,
 }
 
 #[derive(Default)]
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>
+    objects: Vec<Box<dyn Hittable>>,
 }
 
 impl HitRecord {
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
         self.front_face = Vec3::dot(&r.dir, outward_normal) < 0.0;
-        self.normal = if self.front_face { *outward_normal} else {-*outward_normal};
+        self.normal = if self.front_face {
+            *outward_normal
+        } else {
+            -*outward_normal
+        };
     }
 }
 
@@ -31,7 +35,6 @@ impl HittableList {
     pub fn add(&mut self, obj: Box<dyn Hittable>) {
         self.objects.push(obj);
     }
-    
 }
 
 impl Hittable for HittableList {
@@ -46,6 +49,6 @@ impl Hittable for HittableList {
             }
         }
 
-        return rec;
+        rec
     }
 }
