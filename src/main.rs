@@ -1,10 +1,11 @@
 use ray_tracer::utils::*;
-use ray_tracer::{Camera, Colour, Hittable, HittableList, Point3, Ray, Sphere};
+use ray_tracer::{Camera, Colour, Hittable, HittableList, Point3, Ray, Sphere, Vec3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: i32 = 400;
 const IMAGE_HEIGHT: i32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as i32;
 const SAMPLES_PER_PIXEL: i32 = 100;
+const MAX_DEPTH: i32 = 50;
 
 fn main() {
     //World
@@ -32,7 +33,7 @@ fn main() {
                 let v = ((j as f64) + random_f64()) / ((IMAGE_HEIGHT - 1) as f64);
 
                 let r = cam.get_ray(u, v);
-                pixel_colour += ray_colour(&r, &world);
+                pixel_colour += ray_colour(&r, &world, MAX_DEPTH);
             }
             write_colour(&pixel_colour, SAMPLES_PER_PIXEL);
         }
@@ -45,10 +46,11 @@ fn write_colour(pixel_col: &Colour, samples_per_pixel: i32) {
     let mut g = pixel_col.y;
     let mut b = pixel_col.z;
 
+    // Divide colour by number of samples and gamma-correct for gamma=2.0
     let scale = 1.0 / (samples_per_pixel as f64);
-    r *= scale;
-    g *= scale;
-    b *= scale;
+    r = f64::sqrt(scale * r);
+    g = f64::sqrt(scale * g);
+    b = f64::sqrt(scale * b);
 
     println!(
         "{} {} {}",
@@ -58,10 +60,16 @@ fn write_colour(pixel_col: &Colour, samples_per_pixel: i32) {
     )
 }
 
-fn ray_colour(r: &Ray, world: &impl Hittable) -> Colour {
+fn ray_colour(r: &Ray, world: &impl Hittable, depth: i32) -> Colour {
+    // If we exceed ray bounce limit, no more light is gathered
+    if depth <= 0 {
+        return Colour::default();
+    }
+
     // if hit object in world
     if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
-        return 0.5 * (rec.normal + Colour::new(1.0, 1.0, 1.0));
+        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+        return 0.5 * ray_colour(&Ray::new(rec.p, target - rec.p), world, depth - 1);
     }
 
     // if did not hit anything

@@ -43,6 +43,16 @@ impl Vec3 {
             random_f64_in_range(min, max),
         )
     }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Vec3::random_in_range(-1.0, 1.0);
+            if p.length_squared() >= 1.0 {
+                continue;
+            }
+            return p;
+        }
+    }
 }
 
 impl ops::AddAssign for Vec3 {
