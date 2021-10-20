@@ -67,8 +67,8 @@ fn ray_colour(r: &Ray, world: &impl Hittable, depth: i32) -> Colour {
     }
 
     // if hit object in world
-    if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+    if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
+        let target = rec.p + rec.normal + Vec3::random_unit_vector();
         return 0.5 * ray_colour(&Ray::new(rec.p, target - rec.p), world, depth - 1);
     }
 

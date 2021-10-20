@@ -53,6 +53,12 @@ impl Vec3 {
             return p;
         }
     }
+
+    pub fn random_unit_vector() -> Self {
+        Self::random_in_unit_sphere().normalized()
+    }
+
+    //TODO: add random_in_hemisphere()? hemispherical scattering
 }
 
 impl ops::AddAssign for Vec3 {
