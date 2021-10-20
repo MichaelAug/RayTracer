@@ -1,3 +1,4 @@
+use crate::utils::{random_f64, random_f64_in_range};
 use std::ops;
 
 pub type Point3 = Vec3;
@@ -11,7 +12,7 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
     }
 
@@ -23,12 +24,24 @@ impl Vec3 {
         self.length_squared().sqrt()
     }
 
-    pub fn normalized(self) -> Self{
+    pub fn normalized(self) -> Self {
         self / self.length()
     }
 
-    pub fn dot(u:&Self, v:&Self) -> f64{
-        u.x * v.x + u.y * v.y + u.z * v.z 
+    pub fn dot(u: &Self, v: &Self) -> f64 {
+        u.x * v.x + u.y * v.y + u.z * v.z
+    }
+
+    pub fn random() -> Self {
+        Vec3::new(random_f64(), random_f64(), random_f64())
+    }
+
+    pub fn random_in_range(min: f64, max: f64) -> Self {
+        Vec3::new(
+            random_f64_in_range(min, max),
+            random_f64_in_range(min, max),
+            random_f64_in_range(min, max),
+        )
     }
 }
 
@@ -96,7 +109,11 @@ impl ops::Mul<f64> for Vec3 {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Self {x: self.x * rhs, y: self.y * rhs, z: self.z * rhs}
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+        }
     }
 }
 
@@ -104,7 +121,11 @@ impl ops::Div<f64> for Vec3 {
     type Output = Self;
 
     fn div(self, rhs: f64) -> Self::Output {
-        Self {x: self.x / rhs, y: self.y / rhs, z: self.z / rhs}
+        Self {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+        }
     }
 }
 
@@ -112,11 +133,13 @@ impl ops::Mul<Vec3> for f64 {
     type Output = Vec3;
 
     fn mul(self, rhs: Vec3) -> Self::Output {
-        Self::Output {x: rhs.x * self, y: rhs.y * self, z: rhs.z * self}
+        Self::Output {
+            x: rhs.x * self,
+            y: rhs.y * self,
+            z: rhs.z * self,
+        }
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -193,14 +216,14 @@ mod tests {
     #[test]
     fn multiply_f64() {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
-        
+
         assert_eq!(Vec3::new(3.0, 6.0, 9.0), v1 * 3.0);
     }
 
     #[test]
     fn divide_f64() {
         let v1 = Vec3::new(3.0, 6.0, 9.0);
-        
+
         assert_eq!(Vec3::new(1.0, 2.0, 3.0), v1 / 3.0);
     }
 

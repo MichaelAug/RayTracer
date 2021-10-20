@@ -1,6 +1,5 @@
-use rand::{thread_rng, Rng};
+use ray_tracer::utils::*;
 use ray_tracer::{Camera, Colour, Hittable, HittableList, Point3, Ray, Sphere};
-use std::f64::consts::PI;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: i32 = 400;
@@ -20,7 +19,7 @@ fn main() {
     }));
 
     //Camera
-    let cam = Camera::new();
+    let cam = Camera::default();
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     // Render
@@ -69,18 +68,4 @@ fn ray_colour(r: &Ray, world: &impl Hittable) -> Colour {
     let unit_dir = r.dir.normalized();
     let t = 0.5 * (unit_dir.y + 1.0);
     (1.0 - t) * Colour::new(1.0, 1.0, 1.0) + t * Colour::new(0.5, 0.7, 1.0)
-}
-
-fn degrees_to_radians(degrees: f64) -> f64 {
-    degrees * PI / 180.0
-}
-
-// random number in range [0, 1)
-fn random_f64() -> f64 {
-    thread_rng().gen()
-}
-
-// random number in range [min, max]
-fn random_f64_in_range(min: f64, max: f64) -> f64 {
-    thread_rng().gen_range(min..=max)
 }

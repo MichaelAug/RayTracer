@@ -2,7 +2,9 @@ mod camera;
 mod hittable;
 mod ray;
 mod sphere;
+pub mod utils;
 mod vector3;
+
 pub use camera::Camera;
 pub use hittable::HitRecord;
 pub use hittable::Hittable;
