@@ -58,6 +58,15 @@ impl Vec3 {
         Self::random_in_unit_sphere().normalized()
     }
 
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        f64::abs(self.x) < s && f64::abs(self.y) < s && f64::abs(self.z) < s
+    }
+
+    pub fn reflect(v: &Self, n: &Self) -> Self {
+        (*v) - 2.0 * Vec3::dot(v, n) * (*n)
+    }
+
     //TODO: add random_in_hemisphere()? hemispherical scattering
 }
 
@@ -157,6 +166,17 @@ impl ops::Mul<Vec3> for f64 {
     }
 }
 
+impl ops::Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Self::Output {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -243,8 +263,18 @@ mod tests {
         assert_eq!(Vec3::new(1.0, 2.0, 3.0), v1 / 3.0);
     }
 
+    #[test]
+    fn near_zero() {
+        let v1 = Vec3::new(0.003, 0.003505, 0.9);
+        assert_eq!(v1.near_zero(), false);
+
+        let v2 = Vec3::new(0.000000009, 0.000000006, 0.000000001);
+        assert_eq!(v2.near_zero(), true);
+    }
+
     //TODO:
     // f64 mul test
     // dot test
     // normalize test
+    // reflect test
 }

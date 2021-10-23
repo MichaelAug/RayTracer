@@ -1,4 +1,5 @@
-use super::{Point3, Ray, Vec3};
+use super::material::*;
+use crate::{Point3, Ray, Vec3};
 
 #[derive(Default)]
 pub struct HitRecord {
@@ -6,6 +7,7 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub material: Material,
 }
 
 #[derive(Default)]

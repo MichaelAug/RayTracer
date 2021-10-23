@@ -1,5 +1,6 @@
+use ray_tracer::material::*;
 use ray_tracer::utils::*;
-use ray_tracer::{Camera, Colour, Hittable, HittableList, Point3, Ray, Sphere, Vec3};
+use ray_tracer::{Camera, Colour, Hittable, HittableList, Point3, Ray, Sphere};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: i32 = 400;
@@ -9,14 +10,39 @@ const MAX_DEPTH: i32 = 50;
 
 fn main() {
     //World
+    let material_ground = Material::Lambertian {
+        albedo: Colour::new(0.8, 0.8, 0.0),
+    };
+    let material_center = Material::Lambertian {
+        albedo: Colour::new(0.7, 0.3, 0.3),
+    };
+    let material_left = Material::Metal {
+        albedo: Colour::new(0.8, 0.8, 0.8),
+    };
+    let material_right = Material::Metal {
+        albedo: Colour::new(0.8, 0.6, 0.2),
+    };
+
     let mut world = HittableList::default();
-    world.add(Box::new(Sphere {
-        center: Point3::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-    }));
     world.add(Box::new(Sphere {
         center: Point3::new(0.0, -100.5, -1.0),
         radius: 100.0,
+        material: material_ground,
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(0.0, 0.0, -1.0),
+        radius: 0.5,
+        material: material_center,
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(-1.0, 0.0, -1.0),
+        radius: 0.5,
+        material: material_left,
+    }));
+    world.add(Box::new(Sphere {
+        center: Point3::new(1.0, 0.0, -1.0),
+        radius: 0.5,
+        material: material_right,
     }));
 
     //Camera
@@ -68,8 +94,12 @@ fn ray_colour(r: &Ray, world: &impl Hittable, depth: i32) -> Colour {
 
     // if hit object in world
     if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
-        let target = rec.p + rec.normal + Vec3::random_unit_vector();
-        return 0.5 * ray_colour(&Ray::new(rec.p, target - rec.p), world, depth - 1);
+        let (attenuation, scattered, should_scatter) = scatter(r, &rec);
+        return if should_scatter {
+            attenuation * ray_colour(&scattered, world, depth - 1)
+        } else {
+            Colour::default()
+        };
     }
 
     // if did not hit anything

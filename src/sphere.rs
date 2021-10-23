@@ -1,3 +1,4 @@
+use crate::material::Material;
 use crate::Vec3;
 
 use super::{HitRecord, Hittable, Point3};
@@ -6,6 +7,17 @@ use super::{HitRecord, Hittable, Point3};
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
+    pub material: Material,
+}
+
+impl Sphere {
+    pub fn new(cen: Point3, r: f64, m: Material) -> Self {
+        Sphere {
+            center: cen,
+            radius: r,
+            material: m,
+        }
+    }
 }
 
 impl Hittable for Sphere {
@@ -34,6 +46,7 @@ impl Hittable for Sphere {
         rec.p = r.at(rec.t);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
+        rec.material = self.material;
 
         Some(rec)
     }

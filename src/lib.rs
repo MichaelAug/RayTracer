@@ -1,5 +1,6 @@
 mod camera;
 mod hittable;
+pub mod material;
 mod ray;
 mod sphere;
 pub mod utils;
