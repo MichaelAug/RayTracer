@@ -29,10 +29,10 @@ impl Default for Material {
 pub fn scatter(r_in: &Ray, rec: &HitRecord) -> (Colour, Ray, bool) {
     match rec.material {
         Material::Metal { albedo, fuzz } => {
-            let reflected = Vec3::reflect(&r_in.dir.normalized(), &rec.normal);
+            let reflected = Vec3::reflect(r_in.dir.normalized(), rec.normal);
 
             let scattered = Ray::new(rec.p, reflected + fuzz * Vec3::random_in_unit_sphere());
-            let should_scatter = Vec3::dot(&scattered.dir, &rec.normal) > 0.0;
+            let should_scatter = Vec3::dot(scattered.dir, rec.normal) > 0.0;
             (albedo, scattered, should_scatter)
         }
         Material::Lambertian { albedo } => {

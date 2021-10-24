@@ -28,7 +28,7 @@ impl Vec3 {
         self / self.length()
     }
 
-    pub fn dot(u: &Self, v: &Self) -> f64 {
+    pub fn dot(u: Self, v: Self) -> f64 {
         u.x * v.x + u.y * v.y + u.z * v.z
     }
 
@@ -58,13 +58,20 @@ impl Vec3 {
         Self::random_in_unit_sphere().normalized()
     }
 
-    pub fn near_zero(&self) -> bool {
+    pub fn near_zero(self) -> bool {
         let s = 1e-8;
         f64::abs(self.x) < s && f64::abs(self.y) < s && f64::abs(self.z) < s
     }
 
-    pub fn reflect(v: &Self, n: &Self) -> Self {
-        (*v) - 2.0 * Vec3::dot(v, n) * (*n)
+    pub fn reflect(v: Self, n: Self) -> Self {
+        v - 2.0 * Vec3::dot(v, n) * n
+    }
+
+    pub fn refract(self, n: Self, etai_over_etat: f64) -> Self {
+        let cos_theta = f64::min(Self::dot(-self, n), 1.0);
+        let r_out_perp = etai_over_etat * (self + cos_theta * n);
+        let r_out_parallel = -f64::sqrt(f64::abs(1.0 - r_out_perp.length_squared())) * n;
+        r_out_perp + r_out_parallel
     }
 
     //TODO: add random_in_hemisphere()? hemispherical scattering
