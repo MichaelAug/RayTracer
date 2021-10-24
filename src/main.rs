@@ -10,18 +10,10 @@ const MAX_DEPTH: i32 = 50;
 
 fn main() {
     //World
-    let material_ground = Material::Lambertian {
-        albedo: Colour::new(0.8, 0.8, 0.0),
-    };
-    let material_center = Material::Lambertian {
-        albedo: Colour::new(0.7, 0.3, 0.3),
-    };
-    let material_left = Material::Metal {
-        albedo: Colour::new(0.8, 0.8, 0.8),
-    };
-    let material_right = Material::Metal {
-        albedo: Colour::new(0.8, 0.6, 0.2),
-    };
+    let material_ground = Material::new_lambertian(Colour::new(0.8, 0.8, 0.0));
+    let material_center = Material::new_lambertian(Colour::new(0.7, 0.3, 0.3));
+    let material_left = Material::new_metal(Colour::new(0.8, 0.8, 0.8), 0.3);
+    let material_right = Material::new_metal(Colour::new(0.8, 0.6, 0.2), 1.0);
 
     let mut world = HittableList::default();
     world.add(Box::new(Sphere {
