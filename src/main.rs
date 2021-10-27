@@ -1,6 +1,7 @@
 use ray_tracer::material::*;
 use ray_tracer::utils::*;
 use ray_tracer::{Camera, Colour, Hittable, HittableList, Point3, Ray, Sphere};
+use std::f64::consts::PI;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: i32 = 400;
@@ -10,42 +11,60 @@ const MAX_DEPTH: i32 = 50;
 
 fn main() {
     //World
-    let material_ground = Material::new_lambertian(Colour::new(0.8, 0.8, 0.0));
-    let material_center = Material::new_lambertian(Colour::new(0.1, 0.2, 0.5));
-    let material_left = Material::new_dielectric(1.5);
-    let material_right = Material::new_metal(Colour::new(0.8, 0.6, 0.2), 1.0);
+    // let material_ground = Material::new_lambertian(Colour::new(0.8, 0.8, 0.0));
+    // let material_center = Material::new_lambertian(Colour::new(0.1, 0.2, 0.5));
+    // let material_left = Material::new_dielectric(1.5);
+    // let material_right = Material::new_metal(Colour::new(0.8, 0.6, 0.2), 1.0);
+    //
+    // let mut world = HittableList::default();
+    // world.add(Box::new(Sphere {
+    //     center: Point3::new(0.0, -100.5, -1.0),
+    //     radius: 100.0,
+    //     material: material_ground,
+    // }));
+    // world.add(Box::new(Sphere {
+    //     center: Point3::new(0.0, 0.0, -1.0),
+    //     radius: 0.5,
+    //     material: material_center,
+    // }));
+    // world.add(Box::new(Sphere {
+    //     center: Point3::new(-1.0, 0.0, -1.0),
+    //     radius: 0.5,
+    //     material: material_left,
+    // }));
+    //
+    // world.add(Box::new(Sphere {
+    //     center: Point3::new(-1.0, 0.0, -1.0),
+    //     radius: -0.4,
+    //     material: material_left,
+    // }));
+    //
+    // world.add(Box::new(Sphere {
+    //     center: Point3::new(1.0, 0.0, -1.0),
+    //     radius: 0.5,
+    //     material: material_right,
+    // }));
 
+    let r = f64::cos(PI / 4.0);
     let mut world = HittableList::default();
+
+    let material_left = Material::new_lambertian(Colour::new(0.0, 0.0, 1.0));
+    let material_right = Material::new_lambertian(Colour::new(1.0, 0.0, 0.0));
+
     world.add(Box::new(Sphere {
-        center: Point3::new(0.0, -100.5, -1.0),
-        radius: 100.0,
-        material: material_ground,
-    }));
-    world.add(Box::new(Sphere {
-        center: Point3::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-        material: material_center,
-    }));
-    world.add(Box::new(Sphere {
-        center: Point3::new(-1.0, 0.0, -1.0),
-        radius: 0.5,
+        center: Point3::new(-r, 0.0, -1.0),
+        radius: r,
         material: material_left,
     }));
 
     world.add(Box::new(Sphere {
-        center: Point3::new(-1.0, 0.0, -1.0),
-        radius: -0.4,
-        material: material_left,
-    }));
-
-    world.add(Box::new(Sphere {
-        center: Point3::new(1.0, 0.0, -1.0),
-        radius: 0.5,
+        center: Point3::new(r, 0.0, -1.0),
+        radius: r,
         material: material_right,
     }));
 
     //Camera
-    let cam = Camera::default();
+    let cam = Camera::new(90.0, ASPECT_RATIO);
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     // Render

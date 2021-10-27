@@ -1,3 +1,4 @@
+use crate::utils::degrees_to_radians;
 use crate::{Point3, Ray, Vec3};
 
 pub struct Camera {
@@ -7,11 +8,13 @@ pub struct Camera {
     vertical: Vec3,
 }
 
-impl Default for Camera {
-    fn default() -> Self {
-        let aspect_ratio: f64 = 16.0 / 9.0;
-        let viewport_height: f64 = 2.0;
+impl Camera {
+    pub fn new(vfov: f64, aspect_ratio: f64) -> Self {
+        let theta = degrees_to_radians(vfov);
+        let h = f64::tan(theta / 2.0);
+        let viewport_height: f64 = 2.0 * h;
         let viewport_width: f64 = aspect_ratio * viewport_height;
+
         let focal_length: f64 = 1.0;
 
         let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
@@ -27,9 +30,7 @@ impl Default for Camera {
             lower_left_corner,
         }
     }
-}
 
-impl Camera {
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         Ray::new(
             self.origin,
