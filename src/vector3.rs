@@ -74,6 +74,13 @@ impl Vec3 {
         r_out_perp + r_out_parallel
     }
 
+    pub fn cross(u: Self, v: Self) -> Self {
+        Vec3 {
+            x: u.y * v.z - u.z * v.y,
+            y: u.z * v.x - u.x * v.z,
+            z: u.x * v.y - u.y * v.x,
+        }
+    }
     //TODO: add random_in_hemisphere()? hemispherical scattering
 }
 
@@ -277,6 +284,14 @@ mod tests {
 
         let v2 = Vec3::new(0.000000009, 0.000000006, 0.000000001);
         assert_eq!(v2.near_zero(), true);
+    }
+
+    #[test]
+    fn cross() {
+        let a = Vec3::new(2.0, 3.0, 4.0);
+        let b = Vec3::new(5.0, 6.0, 7.0);
+
+        assert_eq!(Vec3::new(-3.0, 6.0, -3.0), Vec3::cross(a, b));
     }
 
     //TODO:
