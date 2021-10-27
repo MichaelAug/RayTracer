@@ -81,6 +81,22 @@ impl Vec3 {
             z: u.x * v.y - u.y * v.x,
         }
     }
+
+    pub fn random_in_unit_disk() -> Self {
+        loop {
+            let p = Vec3::new(
+                random_f64_in_range(-1.0, 1.0),
+                random_f64_in_range(-1.0, 1.0),
+                0.0,
+            );
+
+            if p.length_squared() >= 1.0 {
+                continue;
+            } else {
+                return p;
+            }
+        }
+    }
     //TODO: add random_in_hemisphere()? hemispherical scattering
 }
 
