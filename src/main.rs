@@ -2,55 +2,24 @@ use ray_tracer::material::*;
 use ray_tracer::utils::*;
 use ray_tracer::{Camera, Colour, Hittable, HittableList, Point3, Ray, Sphere, Vec3};
 
-const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: i32 = 400;
-const IMAGE_HEIGHT: i32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as i32;
-const SAMPLES_PER_PIXEL: i32 = 100;
-const MAX_DEPTH: i32 = 50;
-
 fn main() {
+    // Image
+    const ASPECT_RATIO: f64 = 3.0 / 2.0;
+    const IMAGE_WIDTH: i32 = 1200;
+    const IMAGE_HEIGHT: i32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as i32;
+    const SAMPLES_PER_PIXEL: i32 = 500;
+    const MAX_DEPTH: i32 = 50;
+
     // World
-    let material_ground = Material::new_lambertian(Colour::new(0.8, 0.8, 0.0));
-    let material_center = Material::new_lambertian(Colour::new(0.1, 0.2, 0.5));
-    let material_left = Material::new_dielectric(1.5);
-    let material_right = Material::new_metal(Colour::new(0.8, 0.6, 0.2), 0.0);
-
-    let mut world = HittableList::default();
-    world.add(Box::new(Sphere {
-        center: Point3::new(0.0, -100.5, -1.0),
-        radius: 100.0,
-        material: material_ground,
-    }));
-    world.add(Box::new(Sphere {
-        center: Point3::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-        material: material_center,
-    }));
-    world.add(Box::new(Sphere {
-        center: Point3::new(-1.0, 0.0, -1.0),
-        radius: 0.5,
-        material: material_left,
-    }));
-
-    world.add(Box::new(Sphere {
-        center: Point3::new(-1.0, 0.0, -1.0),
-        radius: -0.45,
-        material: material_left,
-    }));
-
-    world.add(Box::new(Sphere {
-        center: Point3::new(1.0, 0.0, -1.0),
-        radius: 0.5,
-        material: material_right,
-    }));
-
-    let look_from = Point3::new(3.0, 3.0, 2.0);
-    let look_at = Point3::new(0.0, 0.0, -1.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
-    let dist_to_focus = (look_from - look_at).length();
-    let aperture = 2.0;
+    let world = random_scene();
 
     //Camera
+    let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+
     let cam = Camera::new(
         look_from,
         look_at,
@@ -61,8 +30,9 @@ fn main() {
         dist_to_focus,
     );
 
-    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     // Render
+    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
+
     for j in (0..IMAGE_HEIGHT).rev() {
         eprintln!("Scan lines remaining: {}", j); //eprintln! flushes buffer
         for i in 0..IMAGE_WIDTH {
@@ -119,4 +89,74 @@ fn ray_colour(r: &Ray, world: &impl Hittable, depth: i32) -> Colour {
     let unit_dir = r.dir.normalized();
     let t = 0.5 * (unit_dir.y + 1.0);
     (1.0 - t) * Colour::new(1.0, 1.0, 1.0) + t * Colour::new(0.5, 0.7, 1.0)
+}
+
+fn random_scene() -> HittableList {
+    let mut world = HittableList::default();
+
+    let ground_material = Material::new_lambertian(Colour::new(0.5, 0.5, 0.5));
+    world.add(Box::new(Sphere {
+        center: Point3::new(0.0, -1000.0, 0.0),
+        radius: 1000.0,
+        material: ground_material,
+    }));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random_f64();
+            let center = Point3::new(
+                (a as f64) + 0.9 * random_f64(),
+                0.2,
+                (b as f64) + 0.9 * random_f64(),
+            );
+
+            if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    let albedo = Colour::random() * Colour::random();
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Material::new_lambertian(albedo),
+                    )));
+                } else if choose_mat < 0.95 {
+                    // metal
+                    let albedo = Colour::random_in_range(0.5, 1.0);
+                    let fuzz = random_f64_in_range(0.0, 0.5);
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Material::new_metal(albedo, fuzz),
+                    )));
+                } else {
+                    // glass
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Material::new_dielectric(1.5),
+                    )));
+                }
+            }
+        }
+    }
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 1.0, 0.0),
+        1.0,
+        Material::new_dielectric(1.5),
+    )));
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(-4.0, 1.0, 0.0),
+        1.0,
+        Material::new_lambertian(Colour::new(0.4, 0.2, 0.1)),
+    )));
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(4.0, 1.0, 0.0),
+        1.0,
+        Material::new_metal(Colour::new(0.7, 0.6, 0.5), 0.0),
+    )));
+
+    world
 }
